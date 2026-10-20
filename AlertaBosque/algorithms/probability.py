@@ -13,7 +13,22 @@ def normalize(weights: dict) -> dict:
     - Rechace pesos negativos, no finitos, diccionarios vacíos y suma cero.
     """
     # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
+    
+    total_weight = 0
+    normalized_weights = {}
+    if not weights: 
+        raise ValueError("Diccionario vacío")
+    for value in weights.values():
+        if value < 0 or  not math.isfinite(value): 
+            raise ValueError("Valor infinito o negativo")
+        total_weight += value
+    
+    if total_weight == 0:
+        raise ValueError("Peso total igual a 0")
+    for id, value in weights.items():
+        normalized_weights[id] = value/total_weight
+        
+    return normalized_weights
     # FIN DEL BLOQUE DEL ESTUDIANTE
 
 
@@ -38,7 +53,11 @@ def expected_utility(distribution: dict, utilities: dict) -> float:
     if any(not math.isfinite(u) for u in utilities.values()):
         raise ValueError("Utilidades no finitas")
     # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
+    expected_utility = 0
+    for id, value in distribution.items():
+        expected_utility +=  utilities[id]*value
+    
+    return expected_utility
     # FIN DEL BLOQUE DEL ESTUDIANTE
 
 
@@ -57,5 +76,17 @@ def best_action(distribution: dict, actions: dict) -> tuple[str, dict]:
     if not actions:
         raise ValueError("Se requiere al menos una acción")
     # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
+    
+    best_action = ""
+    best_expected_utility = -math.inf
+    action_utilities = {}
+    for id, action in actions.items():
+        action_expected_utility = expected_utility(distribution,action)
+        action_utilities[id] = action_expected_utility
+        if action_expected_utility>best_expected_utility:
+            best_action = id
+            best_expected_utility = action_expected_utility
+    return (best_action, action_utilities)
+
+
     # FIN DEL BLOQUE DEL ESTUDIANTE
