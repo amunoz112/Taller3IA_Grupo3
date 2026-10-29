@@ -25,7 +25,21 @@ def action_value(mdp, state, action, values):
       values[terminal] es cero.
     """
     # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
+
+    total = 0.0
+
+    for successor, probability in mdp.transitions(state, action):
+
+        reward = mdp.reward(state, action, successor)
+
+        future_value = values[successor]
+
+        total += probability * (
+            reward + mdp.discount * future_value
+        )
+
+    return total
+
     # FIN DEL BLOQUE DEL ESTUDIANTE
 
 
@@ -47,20 +61,60 @@ def value_iteration(mdp, tolerance=1e-8, max_iterations=1000):
     - Al terminar el bloque, values debe contener el nuevo barrido, delta
       su cambio máximo y converged el resultado de delta < tolerance.
     """
+
     # Validación e inicialización desde V0=0.
     if not math.isfinite(tolerance) or tolerance <= 0 or max_iterations < 1:
         raise ValueError('Tolerancia y límite de iteraciones deben ser positivos')
+
     values = dict.fromkeys(mdp.states, 0.0)
     history, deltas = [values.copy()], []
+
     for _ in range(max_iterations):
+
         # TODO: Add your code here
-        raise NotImplementedError("Complete este bloque TODO")
+
+        new_values = {}
+        delta = 0.0
+
+        for state in mdp.states:
+
+            actions = mdp.actions(state)
+
+            if not actions:
+                new_values[state] = 0.0
+                continue
+
+            best_value = float("-inf")
+
+            for action in actions:
+
+                q_value = action_value(
+                    mdp, state, action, values
+                )
+
+                if q_value > best_value:
+                    best_value = q_value
+
+            new_values[state] = best_value
+
+            difference = abs(best_value - values[state])
+
+            if difference > delta:
+                delta = difference
+
+        values = new_values
+
+        converged = delta < tolerance
+
         # FIN DEL BLOQUE DEL ESTUDIANTE
+
         # Copias para la animación y empaquetado del resultado.
         history.append(values.copy())
         deltas.append(delta)
+
         if converged:
             return PlanningResult(values, history, deltas, True)
+
     return PlanningResult(values, history, deltas, False)
 
 
@@ -75,5 +129,26 @@ def extract_policy(mdp, values):
     - Respete mdp.actions: desempate N, E, S, W conservando el primero.
     """
     # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
+    policy = {}
+
+    for state in mdp.states:
+        actions = mdp.actions(state)
+
+        if not actions:
+            policy[state] = None
+            continue
+
+        best_action = None
+        best_value = float("-inf")
+
+        for action in actions:
+            q_value = action_value(mdp, state, action, values)
+
+            if q_value > best_value:
+                best_value = q_value
+                best_action = action
+
+        policy[state] = best_action
+
+    return policy
     # FIN DEL BLOQUE DEL ESTUDIANTE
