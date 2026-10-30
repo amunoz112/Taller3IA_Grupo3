@@ -25,5 +25,29 @@ def enumeration_ask(network, query: str, evidence: dict) -> dict:
     network.validate_query(query, evidence)
 
     # TODO: Add your code here
-    raise NotImplementedError("Complete este bloque TODO")
+    def enumerate_all(variables, event):
+        if not variables:
+            return 1.0
+
+        variable = variables[0]
+        remaining = variables[1:]
+        if variable in event:
+            probability = network.probability(variable, event[variable], event)
+            return probability * enumerate_all(remaining, event)
+
+        total = 0.0
+        for value in (0, 1):
+            extended = event.copy()
+            extended[variable] = value
+            probability = network.probability(variable, value, extended)
+            total += probability * enumerate_all(remaining, extended)
+        return total
+
+    weights = {0: 0.0, 1: 0.0}
+    for value in (0, 1):
+        if query in evidence and evidence[query] != value:
+            continue
+        event = evidence.copy()
+        event[query] = value
+        weights[value] = enumerate_all(network.variables, event)
     # FIN DEL BLOQUE DEL ESTUDIANTE
