@@ -50,4 +50,5 @@ def enumeration_ask(network, query: str, evidence: dict) -> dict:
         event = evidence.copy()
         event[query] = value
         weights[value] = enumerate_all(network.variables, event)
+    return normalize(weights)
     # FIN DEL BLOQUE DEL ESTUDIANTE
